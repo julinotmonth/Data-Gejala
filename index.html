@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Gejala - SP-PAROK</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .controls {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.8rem 1rem 0.8rem 2.5rem;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        .filter-select {
+            padding: 0.8rem 1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #219a52;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+
+        .data-table th {
+            background: #2c3e50;
+            color: white;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .severity-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .severity-ringan {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .severity-sedang {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .severity-berat {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .category-badge {
+            padding: 0.3rem 0.6rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+            margin: 0.1rem;
+        }
+
+        .category-pernapasan {
+            background: #e3f2fd;
+            color: #0d47a1;
+        }
+
+        .category-sistemik {
+            background: #fce4ec;
+            color: #880e4f;
+        }
+
+        .category-kardiovaskular {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-card i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                min-width: 100%;
+            }
+
+            .data-table {
+                font-size: 0.9rem;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 0.7rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-list-ul"></i> Data Gejala Penyakit Rokok</h1>
+            <p>Sistem Pakar SP-PAROK - Database Gejala untuk Forward Chaining</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <i class="fas fa-clipboard-list" style="color: #3498db;"></i>
+                <h3 id="totalSymptoms">12</h3>
+                <p>Total Gejala</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-exclamation-triangle" style="color: #f39c12;"></i>
+                <h3 id="severeSymptomsCount">4</h3>
+                <p>Gejala Berat</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-lungs" style="color: #e74c3c;"></i>
+                <h3 id="respiratoryCount">8</h3>
+                <p>Gejala Pernapasan</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-heartbeat" style="color: #27ae60;"></i>
+                <h3 id="systemicCount">4</h3>
+                <p>Gejala Sistemik</p>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Cari gejala..." onkeyup="filterTable()">
+            </div>
+            
+            <select class="filter-select" id="severityFilter" onchange="filterTable()">
+                <option value="">Semua Tingkat Keparahan</option>
+                <option value="Ringan">Ringan</option>
+                <option value="Sedang">Sedang</option>
+                <option value="Berat">Berat</option>
+            </select>
+            
+            <select class="filter-select" id="categoryFilter" onchange="filterTable()">
+                <option value="">Semua Kategori</option>
+                <option value="Pernapasan">Pernapasan</option>
+                <option value="Sistemik">Sistemik</option>
+                <option value="Kardiovaskular">Kardiovaskular</option>
+            </select>
+            
+            <button class="btn btn-primary" onclick="showAddModal()">
+                <i class="fas fa-plus"></i> Tambah Gejala
+            </button>
+            
+            <button class="btn btn-success" onclick="exportData()">
+                <i class="fas fa-download"></i> Export
+            </button>
+        </div>
+
+        <div class="table-container">
+            <table class="data-table" id="symptomsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Kode Gejala</th>
+                        <th>Nama Gejala</th>
+                        <th>Deskripsi</th>
+                        <th>Kategori</th>
+                        <th>Tingkat Keparahan</th>
+                        <th>Bobot CF</th>
+                        <th>Penyakit Terkait</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="symptomsTableBody">
+                    <!-- Data will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="symptomModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle">Tambah Gejala Baru</h2>
+            <form id="symptomForm">
+                <div class="form-group">
+                    <label for="symptomCode">Kode Gejala</label>
+                    <input type="text" id="symptomCode" required>
+                </div>
+                <div class="form-group">
+                    <label for="symptomName">Nama Gejala</label>
+                    <input type="text" id="symptomName" required>
+                </div>
+                <div class="form-group">
+                    <label for="symptomDescription">Deskripsi</label>
+                    <textarea id="symptomDescription" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="symptomCategory">Kategori</label>
+                    <select id="symptomCategory" required>
+                        <option value="Pernapasan">Pernapasan</option>
+                        <option value="Sistemik">Sistemik</option>
+                        <option value="Kardiovaskular">Kardiovaskular</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="symptomSeverity">Tingkat Keparahan</label>
+                    <select id="symptomSeverity" required>
+                        <option value="Ringan">Ringan</option>
+                        <option value="Sedang">Sedang</option>
+                        <option value="Berat">Berat</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="symptomWeight">Bobot CF (0.1-1.0)</label>
+                    <input type="number" id="symptomWeight" min="0.1" max="1.0" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label for="relatedDiseases">Penyakit Terkait</label>
+                    <input type="text" id="relatedDiseases" placeholder="Pisahkan dengan koma">
+                </div>
+                <div style="text-align: right; margin-top: 2rem;">
+                    <button type="button" class="btn btn-danger" onclick="closeModal()">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Sample symptoms data based on the original form
+        let symptomsData = [
+            {
+                id: 1,
+                code: 'G001',
+                name: 'Batuk kronis',
+                description: 'Batuk yang berlangsung lebih dari 3 minggu, sering kali produktif dengan dahak',
+                category: 'Pernapasan',
+                severity: 'Sedang',
+                weight: 0.7,
+                relatedDiseases: ['Bronkitis Kronis', 'PPOK', 'Kanker Paru']
+            },
+            {
+                id: 2,
+                code: 'G002',
+                name: 'Sesak napas',
+                description: 'Kesulitan bernapas atau merasa tidak cukup udara, terutama saat beraktivitas',
+                category: 'Pernapasan',
+                severity: 'Berat',
+                weight: 0.8,
+                relatedDiseases: ['Bronkitis Kronis', 'PPOK', 'Asma']
+            },
+            {
+                id: 3,
+                code: 'G003',
+                name: 'Nyeri dada',
+                description: 'Rasa sakit atau tidak nyaman di area dada, bisa tajam atau tumpul',
+                category: 'Pernapasan',
+                severity: 'Berat',
+                weight: 0.6,
+                relatedDiseases: ['Kanker Paru', 'Penyakit Jantung', 'Pleuritis']
+            },
+            {
+                id: 4,
+                code: 'G004',
+                name: 'Mudah lelah',
+                description: 'Kelelahan yang tidak normal dan berkepanjangan meski aktivitas ringan',
+                category: 'Sistemik',
+                severity: 'Sedang',
+                weight: 0.5,
+                relatedDiseases: ['PPOK', 'Anemia', 'Penyakit Jantung']
+            },
+            {
+                id: 5,
+                code: 'G005',
+                name: 'Sering infeksi paru',
+                description: 'Pneumonia atau bronkitis berulang lebih dari 2 kali dalam setahun',
+                category: 'Pernapasan',
+                severity: 'Berat',
+                weight: 0.7,
+                relatedDiseases: ['PPOK', 'Bronkitis Kronis', 'Imunodefisiensi']
+            },
+            {
+                id: 6,
+                code: 'G006',
+                name: 'Berat badan turun',
+                description: 'Penurunan berat badan tanpa sebab yang jelas, lebih dari 5% dalam 6 bulan',
+                category: 'Sistemik',
+                severity: 'Berat',
+                weight: 0.8,
+                relatedDiseases: ['Kanker Paru', 'PPOK Stadium Lanjut', 'Malnutrisi']
+            },
+            {
+                id: 7,
+                code: 'G007',
+                name: 'Batuk darah',
+                description: 'Mengeluarkan darah saat batuk, dari bercak hingga volume banyak',
+                category: 'Pernapasan',
+                severity: 'Berat',
+                weight: 0.9,
+                relatedDiseases: ['Kanker Paru', 'Tuberkulosis', 'Bronkiektasis']
+            },
+            {
+                id: 8,
+                code: 'G008',
+                name: 'Nafas berbunyi',
+                description: 'Suara wheezing atau mengi saat bernapas, terutama saat ekspirasi',
+                category: 'Pernapasan',
+                severity: 'Sedang',
+                weight: 0.6,
+                relatedDiseases: ['PPOK', 'Asma', 'Bronkitis']
+            },
+            {
+                id: 9,
+                code: 'G009',
+                name: 'Bengkak kaki',
+                description: 'Pembengkakan pada kaki dan pergelangan kaki, terutama sore hari',
+                category: 'Kardiovaskular',
+                severity: 'Sedang',
+                weight: 0.5,
+                relatedDiseases: ['Penyakit Jantung', 'PPOK Stadium Lanjut']
+            },
+            {
+                id: 10,
+                code: 'G010',
+                name: 'Suara serak',
+                description: 'Perubahan suara menjadi serak atau hilang suara tanpa sebab jelas',
+                category: 'Pernapasan',
+                severity: 'Ringan',
+                weight: 0.4,
+                relatedDiseases: ['Kanker Laring', 'Laringitis Kronis']
+            },
+            {
+                id: 11,
+                code: 'G011',
+                name: 'Demam berulang',
+                description: 'Demam ringan yang sering kambuh tanpa infeksi yang jelas',
+                category: 'Sistemik',
+                severity: 'Ringan',
+                weight: 0.3,
+                relatedDiseases: ['Infeksi Paru Berulang', 'Tuberkulosis']
+            },
+            {
+                id: 12,
+                code: 'G012',
+                name: 'Jari clubbing',
+                description: 'Perubahan bentuk ujung jari menjadi bulat seperti tabuh genderang',
+                category: 'Sistemik',
+                severity: 'Berat',
+                weight: 0.8,
+                relatedDiseases: ['Kanker Paru', 'PPOK Stadium Lanjut', 'Penyakit Jantung']
+            }
+        ];
+
+        let editingId = null;
+
+        function populateTable() {
+            const tableBody = document.getElementById('symptomsTableBody');
+            tableBody.innerHTML = '';
+
+            symptomsData.forEach(symptom => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${symptom.id}</td>
+                    <td><strong>${symptom.code}</strong></td>
+                    <td>${symptom.name}</td>
+                    <td>${symptom.description}</td>
+                    <td><span class="category-badge category-${symptom.category.toLowerCase()}">${symptom.category}</span></td>
+                    <td><span class="severity-badge severity-${symptom.severity.toLowerCase()}">${symptom.severity}</span></td>
+                    <td>${symptom.weight}</td>
+                    <td>${symptom.relatedDiseases.join(', ')}</td>
+                    <td>
+                        <button class="btn btn-warning" onclick="editSymptom(${symptom.id})" style="margin-right: 0.5rem;">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteSymptom(${symptom.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+            });
+
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('totalSymptoms').textContent = symptomsData.length;
+            document.getElementById('severeSymptomsCount').textContent = symptomsData.filter(s => s.severity === 'Berat').length;
+            document.getElementById('respiratoryCount').textContent = symptomsData.filter(s => s.category === 'Pernapasan').length;
+            document.getElementById('systemicCount').textContent = symptomsData.filter(s => s.category === 'Sistemik').length;
+        }
+
+        function filterTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const severityFilter = document.getElementById('severityFilter').value;
+            const categoryFilter = document.getElementById('categoryFilter').value;
+
+            const rows = document.querySelectorAll('#symptomsTableBody tr');
+            
+            rows.forEach(row => {
+                const name = row.cells[2].textContent.toLowerCase();
+                const description = row.cells[3].textContent.toLowerCase();
+                const category = row.cells[4].textContent;
+                const severity = row.cells[5].textContent;
+
+                const matchesSearch = name.includes(searchTerm) || description.includes(searchTerm);
+                const matchesSeverity = !severityFilter || severity.includes(severityFilter);
+                const matchesCategory = !categoryFilter || category.includes(categoryFilter);
+
+                row.style.display = matchesSearch && matchesSeverity && matchesCategory ? '' : 'none';
+            });
+        }
+
+        function showAddModal() {
+            editingId = null;
+            document.getElementById('modalTitle').textContent = 'Tambah Gejala Baru';
+            document.getElementById('symptomForm').reset();
+            document.getElementById('symptomModal').style.display = 'block';
+        }
+
+        function editSymptom(id) {
+            const symptom = symptomsData.find(s => s.id === id);
+            if (symptom) {
+                editingId = id;
+                document.getElementById('modalTitle').textContent = 'Edit Gejala';
+                document.getElementById('symptomCode').value = symptom.code;
+                document.getElementById('symptomName').value = symptom.name;
+                document.getElementById('symptomDescription').value = symptom.description;
+                document.getElementById('symptomCategory').value = symptom.category;
+                document.getElementById('symptomSeverity').value = symptom.severity;
+                document.getElementById('symptomWeight').value = symptom.weight;
+                document.getElementById('relatedDiseases').value = symptom.relatedDiseases.join(', ');
+                document.getElementById('symptomModal').style.display = 'block';
+            }
+        }
+
+        function deleteSymptom(id) {
+            if (confirm('Apakah Anda yakin ingin menghapus gejala ini?')) {
+                symptomsData = symptomsData.filter(s => s.id !== id);
+                populateTable();
+                alert('Gejala berhasil dihapus!');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('symptomModal').style.display = 'none';
+        }
+
+        function exportData() {
+            const csvContent = "data:text/csv;charset=utf-8," + 
+                "ID,Kode,Nama,Deskripsi,Kategori,Tingkat Keparahan,Bobot CF,Penyakit Terkait\n" +
+                symptomsData.map(s => 
+                    `${s.id},"${s.code}","${s.name}","${s.description}","${s.category}","${s.severity}",${s.weight},"${s.relatedDiseases.join('; ')}"`
+                ).join("\n");
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "data_gejala_sp_parok.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Form submission
+        document.getElementById('symptomForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                code: document.getElementById('symptomCode').value,
+                name: document.getElementById('symptomName').value,
+                description: document.getElementById('symptomDescription').value,
+                category: document.getElementById('symptomCategory').value,
+                severity: document.getElementById('symptomSeverity').value,
+                weight: parseFloat(document.getElementById('symptomWeight').value),
+                relatedDiseases: document.getElementById('relatedDiseases').value.split(',').map(d => d.trim()).filter(d => d)
+            };
+
+            if (editingId) {
+                // Edit existing symptom
+                const index = symptomsData.findIndex(s => s.id === editingId);
+                if (index !== -1) {
+                    symptomsData[index] = { ...symptomsData[index], ...formData };
+                    alert('Gejala berhasil diperbarui!');
+                }
+            } else {
+                // Add new symptom
+                const newId = Math.max(...symptomsData.map(s => s.id)) + 1;
+                symptomsData.push({ id: newId, ...formData });
+                alert('Gejala berhasil ditambahkan!');
+            }
+
+            populateTable();
+            closeModal();
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(e) {
+            const modal = document.getElementById('symptomModal');
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Initialize table
+        document.addEventListener('DOMContentLoaded', function() {
+            populateTable();
+        });
+    </script>
+</body>
+</html>
